@@ -1,3 +1,5 @@
+all: build
+
 clean:
 	./bam -c
 	
