@@ -235,6 +235,10 @@ MACRO_CONFIG_INT(SvWhisperAdmin, sv_whisper_allow_to_admin, 0, 0, 1, CFGFLAG_SER
 MACRO_CONFIG_INT(SvLaserScore, sv_laser_score, 0, 0, 1, CFGFLAG_SERVER, "Shows new score and checkpoints in laserfont above the player")
 MACRO_CONFIG_INT(SvRMNinjaResetVel, sv_rmninja_reset_vel, 0, 0, 1, CFGFLAG_SERVER, "Shows new score and checkpoints in laserfont above the player")
 MACRO_CONFIG_INT(SvFainbowFeet, sv_rainbow_feet, 0, 0, 1, CFGFLAG_SERVER, "The feets of the tees are rainbow")
+// TODO: add descriptions
+MACRO_CONFIG_INT(SvRescuesStart, sv_rescues_start, 3, 0, 1000, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(SvRescuesMaximum, sv_rescues_maximum, 10, 1, 1000, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(SvRescuesTicker, sv_rescues_regeneration, 30, 1, 1000, CFGFLAG_SERVER, "")
 
 MACRO_CONFIG_INT(SvEvents, sv_events, 1, 0, 1, CFGFLAG_SERVER, "Enable triggering of server events, like the happy eyeemotes on some holidays.")
 

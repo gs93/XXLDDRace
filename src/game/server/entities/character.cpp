@@ -1897,9 +1897,9 @@ void CCharacter::XXLDDRaceInit()
 	m_LastRescue = 0;
 	m_IceHammer = false;
 	m_Fly = true;
-	m_Rescues = 3;
+	m_Rescues = g_Config.m_SvRescuesStart;
 	RefreshRescuesCounter();
-	m_RescuesTick = 30 * Server()->TickSpeed();
+	m_RescuesTick = g_Config.m_SvRescuesTicker * Server()->TickSpeed();
 }
 
 void CCharacter::XXLDDRaceTick(){
@@ -1910,11 +1910,11 @@ void CCharacter::XXLDDRaceTick(){
 	if(m_LastRescue > 0) m_LastRescue--;
 	if(m_LastRescueSave > 0) m_LastRescueSave--;
 
-	if (--m_RescuesTick <= 0 && m_Rescues < 10) {
+	if (--m_RescuesTick <= 0 && m_Rescues < g_Config.m_SvRescuesMaximum) {
 		if (m_FreezeTime && m_Rescues == 0)
 			GameServer()->SendChatTarget(GetPlayer()->GetCID(), "You've got an rescue.");
 		m_Rescues++;
-		m_RescuesTick = 30 * Server()->TickSpeed();
+		m_RescuesTick = g_Config.m_SvRescuesTicker * Server()->TickSpeed();
 		RefreshRescuesCounter();
 	}
 }
