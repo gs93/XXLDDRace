@@ -267,7 +267,7 @@ void CCharacter::HandleWeaponSwitch()
 
 void CCharacter::FireWeapon()
 {
-	if(m_ReloadTimer != 0)
+	if(m_ReloadTimer != 0 || m_FreezeTime || m_DeepFreeze)
 		return;
 
 	DoWeaponSwitch();
@@ -290,21 +290,6 @@ void CCharacter::FireWeapon()
 
 	if(!WillFire)
 		return;
-
-	// check for ammo
-	if(!m_aWeapons[m_ActiveWeapon].m_Ammo)
-	{
-		/*// 125ms is a magical limit of how fast a human can click
-		m_ReloadTimer = 125 * Server()->TickSpeed() / 1000;
-		GameServer()->CreateSound(m_Pos, SOUND_WEAPON_NOAMMO);*/
-		// Timer stuff to avoid shrieking orchestra caused by unfreeze-plasma
-		if(m_PainSoundTimer<=0)
-		{
-				m_PainSoundTimer = 1 * Server()->TickSpeed();
-				GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_LONG, Teams()->TeamMask(Team(), -1, m_pPlayer->GetCID()));
-		}
-		return;
-	}
 
 	vec2 ProjStartPos = m_Pos+Direction*m_ProximityRadius*0.75f;
 
@@ -550,11 +535,9 @@ void CCharacter::HandleWeapons()
 
 bool CCharacter::GiveWeapon(int Weapon, int Ammo)
 {
-	if(m_aWeapons[Weapon].m_Ammo < g_pData->m_Weapons.m_aId[Weapon].m_Maxammo || !m_aWeapons[Weapon].m_Got)
+	if(!m_aWeapons[Weapon].m_Got)
 	{
 		m_aWeapons[Weapon].m_Got = true;
-		if(!m_FreezeTime)
-			m_aWeapons[Weapon].m_Ammo = min(g_pData->m_Weapons.m_aId[Weapon].m_Maxammo, Ammo);
 		return true;
 	}
 	return false;
@@ -1832,11 +1815,6 @@ bool CCharacter::Freeze(int Seconds)
 		 return false;
 	if (m_FreezeTick < Server()->Tick() - Server()->TickSpeed() || Seconds == -1)
 	{
-		for(int i = 0; i < NUM_WEAPONS; i++)
-			if(m_aWeapons[i].m_Got)
-			 {
-				 m_aWeapons[i].m_Ammo = 0;
-			 }
 		m_Armor = 0;
 		m_FreezeTime = Seconds == -1 ? Seconds : Seconds * Server()->TickSpeed();
 		m_FreezeTick = Server()->Tick();
@@ -1855,11 +1833,6 @@ bool CCharacter::UnFreeze()
 	if (m_FreezeTime > 0)
 	{
 		m_Armor=10;
-		for(int i=0;i<NUM_WEAPONS;i++)
-			if(m_aWeapons[i].m_Got)
-			 {
-				 m_aWeapons[i].m_Ammo = -1;
-			 }
 		if(!m_aWeapons[m_ActiveWeapon].m_Got)
 			m_ActiveWeapon = WEAPON_GUN;
 		m_FreezeTime = 0;
@@ -1872,12 +1845,9 @@ bool CCharacter::UnFreeze()
 
 void CCharacter::GiveAllWeapons()
 {
-	 for(int i=1;i<NUM_WEAPONS-1;i++)
-	 {
-		 m_aWeapons[i].m_Got = true;
-		 if(!m_FreezeTime) m_aWeapons[i].m_Ammo = -1;
-	 }
-	 return;
+	for(int i=1;i<NUM_WEAPONS-1;i++)
+		m_aWeapons[i].m_Got = true;
+	return;
 }
 
 void CCharacter::Pause(bool Pause)
@@ -1927,6 +1897,9 @@ void CCharacter::XXLDDRaceInit()
 	m_LastRescue = 0;
 	m_IceHammer = false;
 	m_Fly = true;
+	m_Rescues = 3;
+	RefreshRescuesCounter();
+	m_RescuesTick = 30 * Server()->TickSpeed();
 }
 
 void CCharacter::XXLDDRaceTick(){
@@ -1936,11 +1909,26 @@ void CCharacter::XXLDDRaceTick(){
 	HandleJumps();
 	if(m_LastRescue > 0) m_LastRescue--;
 	if(m_LastRescueSave > 0) m_LastRescueSave--;
+
+	if (--m_RescuesTick <= 0 && m_Rescues < 10) {
+		if (m_FreezeTime && m_Rescues == 0)
+			GameServer()->SendChatTarget(GetPlayer()->GetCID(), "You've got an rescue.");
+		m_Rescues++;
+		m_RescuesTick = 30 * Server()->TickSpeed();
+		RefreshRescuesCounter();
+	}
 }
 
 void CCharacter::XXLDDRacePostCoreTick()
 {
 	if(m_pPlayer->m_RconFreeze) Freeze(-1);
+}
+
+void CCharacter::RefreshRescuesCounter()
+{
+	for(int i=0;i<NUM_WEAPONS;i++) {
+		m_aWeapons[i].m_Ammo = m_Rescues;
+	}
 }
 
 void CCharacter::HandleBlood()

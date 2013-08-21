@@ -253,6 +253,9 @@ public:
 	vec2 m_RescuePos;
 	int m_LastRescue;
 	int m_LastRescueSave;
+	int m_Rescues;
+	int m_RescuesTick;
+	void RefreshRescuesCounter();
 	bool m_IceHammer;
 	bool m_Fly;
 	int m_HammerType;
