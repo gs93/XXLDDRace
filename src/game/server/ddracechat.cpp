@@ -864,7 +864,6 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter* pChr = pSelf->m_apPlayers[pResult->m_ClientID]->GetCharacter();
-	char aBuf[256];
 
 	if (!g_Config.m_SvRescue){
 		pSelf->SendChatTarget(pResult->m_ClientID, "Rescue is not activated.");
