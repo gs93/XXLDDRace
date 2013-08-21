@@ -25,7 +25,6 @@ Debug
 bam
 build server.bat
 buildlog.txt
-autoexec.cfg
 bam.exe
 *.bat
 *.cmd
