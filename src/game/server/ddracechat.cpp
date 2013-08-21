@@ -885,7 +885,7 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 				pSelf->SendChatTarget(pResult->m_ClientID, "No position saved!");
 			else
 			{
-				//not freezed
+				//player is freezed
 				for(int i = 0;i <=(int)MAX_CLIENTS-1 ; i++)
 				{
 					if ( pSelf->m_apPlayers[i])
