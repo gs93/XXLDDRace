@@ -883,7 +883,7 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 				pSelf->SendChatTarget(pResult->m_ClientID, "You are not alive!");
 			else if (pChr->m_RescuePos == vec2 (0,0)) //hum
 				pSelf->SendChatTarget(pResult->m_ClientID, "No position saved!");
-			else if (pChr->m_Rescues == 0)
+			else if (g_Config.m_SvSlowDownRescue && pChr->m_Rescues == 0)
 				pSelf->SendChatTarget(pResult->m_ClientID, "You have no rescues left!");
 			else
 			{
@@ -912,9 +912,11 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 				}
 				//"save" last rescue time
 				pChr->m_LastRescue = RescueDelay * pSelf->Server()->TickSpeed();
-				//decrease unfreeze counter
-				pChr->m_Rescues--;
-				pChr->RefreshRescuesCounter();
+				if (g_Config.m_SvSlowDownRescue) {
+					//decrease unfreeze counter
+					pChr->m_Rescues--;
+					pChr->RefreshRescuesCounter();
+				}
 				//Teleport player
 				pChr->Core()->m_Pos = pChr->m_RescuePos;
 			}
@@ -923,6 +925,8 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 		{
 			if (pChr->m_TileIndex != TILE_FREEZE && pChr->m_TileFIndex != TILE_FREEZE)
 				pChr->UnFreeze();
+			else if (!g_Config.m_SvSlowDownRescue)
+				pChr->m_LastRescue = 0;
 		}
 	}
 	else
