@@ -267,7 +267,7 @@ void CCharacter::HandleWeaponSwitch()
 
 void CCharacter::FireWeapon()
 {
-	if(m_ReloadTimer != 0 || m_FreezeTime || m_DeepFreeze)
+	if(m_ReloadTimer != 0)
 		return;
 
 	DoWeaponSwitch();
@@ -290,6 +290,14 @@ void CCharacter::FireWeapon()
 
 	if(!WillFire)
 		return;
+
+	if (m_FreezeTime || m_DeepFreeze) {
+		if(m_PainSoundTimer <= 0) {
+			m_PainSoundTimer = 1 * Server()->TickSpeed();
+			GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_LONG, Teams()->TeamMask(Team(), -1, m_pPlayer->GetCID()));
+		}
+		return;
+	}
 
 	vec2 ProjStartPos = m_Pos+Direction*m_ProximityRadius*0.75f;
 
