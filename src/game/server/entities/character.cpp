@@ -1936,9 +1936,7 @@ void CCharacter::XXLDDRacePostCoreTick()
 
 void CCharacter::RefreshRescuesCounter()
 {
-	for(int i=0;i<NUM_WEAPONS;i++) {
-		m_aWeapons[i].m_Ammo = m_Rescues;
-	}
+	m_Health = m_Rescues;
 }
 
 void CCharacter::HandleBlood()
